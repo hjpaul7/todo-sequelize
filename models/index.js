@@ -5,17 +5,11 @@ const ToDoList = require("./ToDoList");
 // Setup Associations
 User.hasMany(ToDoList, {
   onDelete: "CASCADE",
-  foreignKey: {
-    allowNull: false,
-    name: "createdBy",
-  },
+  foreignKey: "createdBy",
 });
 ToDoList.hasMany(ToDoItem, {
   onDelete: "CASCADE",
-  foreignKey: {
-    allowNull: false,
-    name: "listId",
-  },
+  foreignKey: "listId",
 });
 
 ToDoList.belongsTo(User);

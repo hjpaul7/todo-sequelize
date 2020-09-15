@@ -40,14 +40,17 @@ ItemController.route("/:id")
         const toUpdate = await ToDoItem.findOne({
           where: {
             id: req.params.id,
-            listId: listID,
+            listId: list.id,
           },
         });
         toUpdate.complete = isComplete;
         toUpdate.save();
+        res.status(200).json({
+          message: "Successfully updated completion",
+        });
       } else {
         res.status(404).json({
-          message: "Cannot update item",
+          message: "Not allowed to update completion on item",
         });
       }
     } catch (e) {
@@ -59,7 +62,7 @@ ItemController.route("/:id")
   })
   .delete(async (req, res) => {
     try {
-      const { listID, isComplete } = req.body;
+      const { listID } = req.body;
       const list = await ToDoList.findOne({
         where: {
           id: listID,
@@ -67,28 +70,27 @@ ItemController.route("/:id")
         },
       });
       if (list) {
-        const toUpdate = await ToDoItem.findOne({
+        const toRemove = await ToDoItem.findOne({
           where: {
             id: req.params.id,
-            listId: listID,
+            listId: list.id,
           },
         });
-        toUpdate
-          ? (toUpdate.complete = isComplete)
-          : res.status(404).json({ message: "Item not part of list" });
-        toUpdate.save();
+        toRemove
+          ? toRemove.destroy()
+          : res.status(404).json({ message: "Item not found" });
         res.status(200).json({
-          message: "Successfully updated completion",
+          message: "Successfully deleted item",
         });
       } else {
         res.status(404).json({
-          message: "Cannot update item",
+          message: "Cannot delete item",
         });
       }
     } catch (e) {
       console.log(e);
       res.status(500).json({
-        message: "Failed to update completion on item",
+        message: "Failed to delete item",
       });
     }
   });
